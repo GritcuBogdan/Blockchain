@@ -5,8 +5,6 @@ import lombok.Setter;
 
 import java.util.Arrays;
 
-@Getter
-@Setter
 public class Block {
     private int previousHash;
     private Transaction[] transactions;
@@ -15,10 +13,30 @@ public class Block {
     public Block(int previousHash, Transaction[] transactions) {
         this.previousHash = previousHash;
         this.transactions = transactions;
-
-        Object[] contents = {Arrays.hashCode(transactions),previousHash};
-        this.blockHash = Arrays.hashCode(contents);
+        this.blockHash = calculateHash();
     }
 
+    public int calculateHash() {
+        int transactionHash = Arrays.stream(transactions)
+                .mapToInt(Transaction::hashCode)
+                .sum();
+        Object[] contents = {transactionHash, previousHash};
+        return Arrays.hashCode(contents);
+    }
 
+    public int getBlockHash() {
+        return blockHash;
+    }
+
+    public int getPreviousHash() {
+        return previousHash;
+    }
+
+    public Transaction[] getTransactions() {
+        return transactions;
+    }
+
+    public void updateHash() {
+        this.blockHash = calculateHash();
+    }
 }

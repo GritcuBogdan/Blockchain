@@ -6,14 +6,31 @@ import java.util.Arrays;
 public class Main {
 
 
-    ArrayList<Block> blockchain = new ArrayList<>();
+
     public static void main(String[] args) {
-        Transaction t1 = new Transaction("001",75.6,"Walletu lu Bonca","Walletu lu Cristi");
-        Transaction[] genesisTransactions = {t1};
+        Blockchain blockchain = new Blockchain();
 
-        //TO-DO: Treb de facut clasa aparte "Blockchain" unde de adaugat block-ul genesis (tipa blockul 0)
-        Block genesisBlock = new Block(0,genesisTransactions);
 
-        System.out.println(genesisBlock.getBlockHash());
+        Transaction t1 = new Transaction("001", 50.0, "WalletA", "WalletB");
+        Transaction t2 = new Transaction("002", 7.6, "WalletB", "WalletC");
+
+        Transaction[] transactionsBlock1 = {t1, t2};
+        blockchain.addBlock(transactionsBlock1);
+
+        blockchain.displayChain();
+
+
+        // Caroci el isi schimba hash-ul atunci cand se schimba priama locul din memorie ( i se atribuie valoare noua)
+        // Adica numa cand t1= new Transaction... daca incerc prin t1.setAmount(123) se schimba amount-ul da t1 ca obiect
+        // Ramane acelasi (in memorie).
+
+        // TO-DO: de implementat o metoda prin care sa se recalculeze hash-ul la orice modificare,(da pana cand astai prototip)
+
+        System.out.println("\nDupa modificare: ");
+        t1 = new Transaction("001", 75.0, "WalletA", "WalletB");
+        blockchain.getLatestBlock().getTransactions()[0] = t1;
+        blockchain.getLatestBlock().updateHash();
+
+        blockchain.displayChain();
     }
 }
