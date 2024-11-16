@@ -11,14 +11,12 @@ public class Transaction {
     private String transactionID;
     private double amount;
 
-    //TO DO: Aici in loc de String treb de facut clasa aparte "PublicKey" tipa adresa de la wallet
     private PublicKey senderAdress;
     private PublicKey receiverAdress;
 
 
     public void setTransactionID(String transactionID) {
         this.transactionID = transactionID;
-
     }
 
     public void setAmount(double amount) {

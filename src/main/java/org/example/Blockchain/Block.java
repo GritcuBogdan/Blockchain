@@ -1,40 +1,56 @@
 package org.example.Blockchain;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.Arrays;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class Block {
-    private int previousHash;
+    private String previousHash;
     private Transaction[] transactions;
-    private int blockHash;
+    private String blockHash;
 
-    public Block(int previousHash, Transaction[] transactions) {
+    public Block(String previousHash, Transaction[] transactions) {
         this.previousHash = previousHash;
         this.transactions = transactions;
         this.blockHash = calculateHash();
     }
 
-    public int calculateHash() {
-        int transactionHash = Arrays.stream(transactions)
-                .mapToInt(Transaction::hashCode)
-                .sum();
-        Object[] contents = {transactionHash, previousHash};
-        return Arrays.hashCode(contents);
+
+    public String calculateHash() {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+            // Concatenate the transactions and previousHash
+            StringBuilder data = new StringBuilder(previousHash);
+            for (Transaction transaction : transactions) {
+                data.append(transaction.hashCode());
+            }
+
+            byte[] hash = digest.digest(data.toString().getBytes());
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                hexString.append(String.format("%02x", b));
+            }
+
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error computing hash", e);
+        }
     }
 
-    public int getBlockHash() {
+    // Getters
+    public String getBlockHash() {
         return blockHash;
     }
 
-    public int getPreviousHash() {
+    public String getPreviousHash() {
         return previousHash;
     }
 
     public Transaction[] getTransactions() {
         return transactions;
     }
+
 
     public void updateHash() {
         this.blockHash = calculateHash();
