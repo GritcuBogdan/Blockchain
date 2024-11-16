@@ -10,9 +10,15 @@ public class Main {
     public static void main(String[] args) {
         Blockchain blockchain = new Blockchain();
 
+        PublicKey k1 = new PublicKey("cheia1");
+        PublicKey k2 = new PublicKey("cheia2");
 
-        Transaction t1 = new Transaction("001", 50.0, "WalletA", "WalletB");
-        Transaction t2 = new Transaction("002", 7.6, "WalletB", "WalletC");
+
+        Transaction t1 = new Transaction("001", 50.0, k1, k2);
+        Transaction t2 = new Transaction("002", 7.6, k1,k2);
+
+
+
 
         Transaction[] transactionsBlock1 = {t1, t2};
         blockchain.addBlock(transactionsBlock1);
@@ -27,7 +33,7 @@ public class Main {
         // TO-DO: de implementat o metoda prin care sa se recalculeze hash-ul la orice modificare,(da pana cand astai prototip)
 
         System.out.println("\nDupa modificare: ");
-        t1 = new Transaction("001", 75.0, "WalletA", "WalletB");
+        t1 = new Transaction("001", 75.0, k1, k2);
         blockchain.getLatestBlock().getTransactions()[0] = t1;
         blockchain.getLatestBlock().updateHash();
 
