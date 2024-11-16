@@ -13,7 +13,9 @@ public class Blockchain {
 
 
     public void createGenesisBlock() {
-        Transaction genesisTransaction = new Transaction("00001", 69.9, "Wallet1", "Wallet2");
+        PublicKey k1 = new PublicKey("cheia0");
+        PublicKey k2 = new PublicKey("cheia1");
+        Transaction genesisTransaction = new Transaction("00001", 69.9,k1 , k2);
         Transaction[] genesisArray = {genesisTransaction};
 
         Block genesisBlock = new Block(0,genesisArray);

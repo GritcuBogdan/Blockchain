@@ -12,8 +12,8 @@ public class Transaction {
     private double amount;
 
     //TO DO: Aici in loc de String treb de facut clasa aparte "PublicKey" tipa adresa de la wallet
-    private String senderAdress;
-    private String receiverAdress;
+    private PublicKey senderAdress;
+    private PublicKey receiverAdress;
 
 
     public void setTransactionID(String transactionID) {
@@ -25,11 +25,11 @@ public class Transaction {
         this.amount = amount;
     }
 
-    public void setSenderAdress(String senderAdress) {
+    public void setSenderAdress(PublicKey senderAdress) {
         this.senderAdress = senderAdress;
     }
 
-    public void setReceiverAdress(String receiverAdress) {
+    public void setReceiverAdress(PublicKey receiverAdress) {
         this.receiverAdress = receiverAdress;
     }
 
