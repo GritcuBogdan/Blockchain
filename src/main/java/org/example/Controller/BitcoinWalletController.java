@@ -2,13 +2,18 @@ package org.example.Controller;
 
 
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.bitcoinj.core.Coin;
 import org.example.Service.BitcoinWalletService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Bitcoin Wallet")
 @Controller
 @RequestMapping("/api/wallet")
 public class BitcoinWalletController {
@@ -16,7 +21,20 @@ public class BitcoinWalletController {
     @Autowired
     private BitcoinWalletService bitcoinWalletService;
 
-
+    @Operation(
+            summary = "Generează o adresă nouă pentru wallet",
+            description = "Creează și returnează o adresă nouă pentru un portofel Bitcoin. Este utilă pentru generarea adreselor suplimentare pentru a primi plăți sau pentru alte scopuri.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Adresa generată cu succes"
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Eroare la generarea adresei"
+                    )
+            }
+    )
     @PostMapping("/generate")
     @ResponseBody
     public String generateNewWallet() {
@@ -24,6 +42,10 @@ public class BitcoinWalletController {
         return address;
     }
 
+    @Operation(
+            summary = "Returnează balanța portefelului",
+            description = "Permite obținerea balanței curente a portofelului Bitcoin"
+    )
     @GetMapping("/balance")
     @ResponseBody
     public String getBalance() {
