@@ -63,7 +63,6 @@
             <version>2.5.0</version>
         </dependency>
 
-        <!-- Optional: Add Spring Boot JPA if you are using PostgreSQL or any DB -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -76,7 +75,11 @@
             <version>42.7.4</version>
         </dependency>
 
-
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.30</version>
+        </dependency>
 
     </dependencies>
 

@@ -7,16 +7,33 @@ import org.bitcoinj.core.*;
 import org.bitcoinj.kits.WalletAppKit;
 import org.bitcoinj.params.TestNet3Params;
 import org.bitcoinj.wallet.Wallet;
+import org.example.Entity.User;
+import org.example.Repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 @Service
 public class BitcoinWalletService {
     private WalletAppKit walletAppKit;
+
+
+    private final UserRepository userRepository;
+
+    public BitcoinWalletService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public void createUser(String username, String passwordHash, String email) {
+        User user = new User();
+        user.setUsername(username);
+        user.setPasswordHash(passwordHash);
+        user.setEmail(email);
+        userRepository.save(user);
+    }
+
 
 
     @PostConstruct
@@ -43,11 +60,7 @@ public class BitcoinWalletService {
         }
     }
     public BitcoinWalletService() {
-
-        NetworkParameters params = TestNet3Params.get();
-
-        walletAppKit = new WalletAppKit(params, new File("wallet"), "wallet");
-
+        throw new UnsupportedOperationException("Default constructor is not supported. Please use the constructor with UserRepository.");
     }
 
     private void connectToPeers() {
