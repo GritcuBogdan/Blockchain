@@ -10,7 +10,6 @@ import org.bitcoinj.wallet.Wallet;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -19,49 +18,11 @@ public class BitcoinWalletService {
     private WalletAppKit walletAppKit;
 
 
-    @PostConstruct
-    public void init() {
-        new Thread(() -> {
-            try {
-                NetworkParameters params = TestNet3Params.get();
-                walletAppKit = new WalletAppKit(params, new java.io.File("wallet"), "wallet");
 
-                walletAppKit.startAsync();
-                walletAppKit.awaitRunning(30, TimeUnit.SECONDS);
-                connectToPeers();
-
-            } catch (TimeoutException e) {
-                throw new RuntimeException("WalletAppKit did not start in time: " + e.getMessage(), e);
-            }
-        }).start();
-    }
-
-    @PreDestroy
-    public void cleanup() {
-        if (walletAppKit != null) {
-            walletAppKit.stopAsync();
-        }
-    }
     public BitcoinWalletService() {
-
         NetworkParameters params = TestNet3Params.get();
-
         walletAppKit = new WalletAppKit(params, new File("wallet"), "wallet");
-
     }
-
-    private void connectToPeers() {
-
-        PeerAddress peer1 = new PeerAddress(walletAppKit.params(), "18.162.45.10", 18333);
-        PeerAddress peer2 = new PeerAddress(walletAppKit.params(), "13.211.216.231", 18333);
-
-
-        walletAppKit.peerGroup().addAddress(peer1);
-        walletAppKit.peerGroup().addAddress(peer2);
-
-        walletAppKit.peerGroup().start();
-    }
-
 
     public String generateNewAdress() {
         try {
@@ -69,29 +30,22 @@ public class BitcoinWalletService {
             Address address = wallet.freshReceiveAddress();
             return address.toString();
         } catch (Exception e) {
-
             return "Error generating new address: " + e.getMessage();
         }
     }
 
-    public Coin getBalance(){
+    public Coin getBalance() {
         Wallet wallet = walletAppKit.wallet();
-       return wallet.getBalance();
+        return wallet.getBalance();
     }
 
-    public String sendTransaction(String toAddress,Coin amount) throws Exception{
+    public String sendTransaction(String toAddress, Coin amount) throws Exception {
         Wallet wallet = walletAppKit.wallet();
-        Address to = Address.fromString(walletAppKit.params(),toAddress);
+        Address to = Address.fromString(walletAppKit.params(), toAddress);
         Coin value = amount;
 
-        Transaction transaction = wallet.createSend(to,value);
-        walletAppKit.peerGroup().broadcastTransaction(transaction);
-
-        return "Transaction Sent: "+ transaction.toString();
+        Transaction transaction = wallet.createSend(to, value);
+        return "Transaction Created: " + transaction.toString();
     }
 
-    public void shutdown(){
-        walletAppKit.stopAsync();
-        walletAppKit.awaitTerminated();
-    }
 }

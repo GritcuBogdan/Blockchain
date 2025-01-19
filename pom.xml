@@ -22,12 +22,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <version>3.2.4</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.30</version>
@@ -51,10 +45,17 @@
             <version>3.2.4</version>
         </dependency>
 
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>2.1.0-alpha1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>3.2.4</version>
         </dependency>
 
         <dependency>
@@ -63,7 +64,6 @@
             <version>2.5.0</version>
         </dependency>
 
-        <!-- Optional: Add Spring Boot JPA if you are using PostgreSQL or any DB -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -74,10 +74,8 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.7.4</version>
+            <scope>runtime</scope>
         </dependency>
-
-
-
     </dependencies>
 
     <build>
@@ -89,7 +87,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.example.App</mainClass> <!-- Replace with your main class -->
+                            <mainClass>org.example.App</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -110,5 +108,7 @@
             </plugin>
         </plugins>
     </build>
+
+
 
 </project>
