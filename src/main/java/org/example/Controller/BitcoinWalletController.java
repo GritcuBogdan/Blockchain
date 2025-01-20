@@ -62,11 +62,6 @@ public class BitcoinWalletController {
         return bitcoinWalletService.sendTransaction(toAdress,cointAmount);
     }
 
-    @PostMapping("/shutdown")
-    public void shutdown()
-    {
-        bitcoinWalletService.shutdown();
-    }
 
     @GetMapping("/")
     public String home(){
