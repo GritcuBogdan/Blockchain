@@ -10,7 +10,7 @@ public class Wallet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long wallet_id;
+    private Long walletId;
 
     @ManyToOne
     @JoinColumn(name = "user_id",nullable = false)
@@ -26,7 +26,7 @@ public class Wallet {
     private LocalDateTime updated_at;
 
     public Wallet(Long wallet_id, User user, Double balance, LocalDateTime created_at, LocalDateTime updated_at) {
-        this.wallet_id = wallet_id;
+        this.walletId = wallet_id;
         this.user = user;
         this.balance = balance;
         this.created_at = created_at;
@@ -38,11 +38,11 @@ public class Wallet {
     }
 
     public Long getWallet_id() {
-        return wallet_id;
+        return walletId;
     }
 
     public void setWallet_id(Long wallet_id) {
-        this.wallet_id = wallet_id;
+        this.walletId = wallet_id;
     }
 
     public User getUser() {
