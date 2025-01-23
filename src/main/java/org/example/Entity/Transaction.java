@@ -1,10 +1,8 @@
 package org.example.Entity;
 
-
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-
 
 @Entity
 @Table(name = "transactions")
@@ -14,11 +12,14 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long transactionId;
 
-    @ManyToOne
-    @JoinColumn(nullable = false)
-    private Wallet wallet;
+    @Column
+    private Long senderWalletId;
 
-    @Column(name = "transaction_type", nullable = false)
+    @Column
+    private Long receiverWalletId;
+
+
+    @Column(nullable = false)
     private String transactionType;
 
     @Column(nullable = false)
@@ -33,13 +34,6 @@ public class Transaction {
     @Column(nullable = false)
     private String transactionHash;
 
-    public String getTransactionType() {
-        return transactionType;
-    }
-
-    public void setTransactionType(String transactionType) {
-        this.transactionType = transactionType;
-    }
 
     public Long getTransactionId() {
         return transactionId;
@@ -49,12 +43,28 @@ public class Transaction {
         this.transactionId = transactionId;
     }
 
-    public Wallet getWallet() {
-        return wallet;
+    public Long getSenderWalletId() {
+        return senderWalletId;
     }
 
-    public void setWallet(Wallet wallet) {
-        this.wallet = wallet;
+    public void setSenderWalletId(Long senderWalletId) {
+        this.senderWalletId = senderWalletId;
+    }
+
+    public Long getReceiverWalletId() {
+        return receiverWalletId;
+    }
+
+    public void setReceiverWalletId(Long receiverWalletId) {
+        this.receiverWalletId = receiverWalletId;
+    }
+
+    public String getTransactionType() {
+        return transactionType;
+    }
+
+    public void setTransactionType(String transactionType) {
+        this.transactionType = transactionType;
     }
 
     public Double getAmount() {

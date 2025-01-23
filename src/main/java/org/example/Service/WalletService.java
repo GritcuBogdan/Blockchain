@@ -22,6 +22,8 @@ public class WalletService {
         this.walletRepository = walletRepository;
     }
 
+
+
     public Wallet addWallet(Long userId, Double initialBalance) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User with ID " + userId + " not found"));
