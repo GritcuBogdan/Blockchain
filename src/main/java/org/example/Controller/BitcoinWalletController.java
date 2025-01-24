@@ -63,9 +63,4 @@ public class BitcoinWalletController {
     }
 
 
-    @GetMapping("/")
-    public String home(){
-        return "index";
-    }
-
 }
