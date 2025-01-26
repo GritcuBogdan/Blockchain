@@ -13,9 +13,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
-public class AuthenticationService {
+public class  AuthenticationService {
 
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
@@ -28,6 +30,7 @@ public class AuthenticationService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
+                .Total_Balance(BigDecimal.ZERO)
                 .build();
         repository.save(user);
         var jwtToken = jwtService.generateToken(user);

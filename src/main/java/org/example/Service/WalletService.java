@@ -1,72 +1,74 @@
-//package org.example.Service;
-//
-//import org.example.Entity.User;
-//import org.example.Entity.Wallet;
-//import org.example.Repository.UserRepository;
-//import org.example.Repository.WalletRepository;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Service;
-//
-//import java.time.LocalDateTime;
-//import java.util.List;
-//import java.util.Optional;
-//
-//@Service
-//public class WalletService {
-//    private WalletRepository walletRepository;
-//
-//    @Autowired
-//    private UserRepository userRepository;
-//
-//    public WalletService(WalletRepository walletRepository) {
-//        this.walletRepository = walletRepository;
-//    }
-//
-//
-//
-//    public Wallet addWallet(Long userId, Double initialBalance) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new RuntimeException("User with ID " + userId + " not found"));
-//
-//
-//        if (user.getBalance() < initialBalance) {
-//            throw new RuntimeException("Insufficient user balance to initialize wallet");
-//        }
-//
-//
-//        user.setBalance(user.getBalance() - initialBalance);
-//        userRepository.save(user);
-//
-//
-//        Wallet wallet = new Wallet();
-//        wallet.setUser(user);
-//        wallet.setBalance(initialBalance);
-//        wallet.setCreated_at(LocalDateTime.now());
-//        wallet.setUpdated_at(LocalDateTime.now());
-//
-//        return walletRepository.save(wallet);
-//    }
-//
-//    public Optional<Wallet> getWalletById(Long id){
-//        return walletRepository.findById(id);
-//    }
-//
-//    public Wallet updateWallet(Long id,Wallet updatedWallet) {
-//        return walletRepository.findById(id).map(wallet ->{
-//            wallet.setBalance(updatedWallet.getBalance());
-//            wallet.setUpdated_at(LocalDateTime.now());
-//
-//            return walletRepository.save(wallet);
-//        })
-//                .orElseThrow(() -> new RuntimeException("Wallent with id " + id + " not found"));
-//
-//    }
-//
-//    public void deleteWallet(Long id) {
-//        walletRepository.deleteById(id);
-//    }
-//
-//   public List<Wallet> getWalletsForUser(Long userId) {
-//        return walletRepository.findByUserId(userId);
-//   }
-//}
+package org.example.Service;
+
+import org.example.Entity.User;
+import org.example.Entity.Wallet;
+import org.example.Repository.UserRepository;
+import org.example.Repository.WalletRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class WalletService {
+
+    private final WalletRepository walletRepository;
+    private final UserRepository userRepository;
+
+    @Autowired
+    public WalletService(WalletRepository walletRepository, UserRepository userRepository) {
+        this.walletRepository = walletRepository;
+        this.userRepository = userRepository;
+    }
+
+    private User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("No authenticated user found");
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails) {
+            String email = ((UserDetails) principal).getUsername();
+            return userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("Authenticated user not found in database"));
+        } else {
+            throw new RuntimeException("Invalid authenticated user principal");
+        }
+    }
+
+    public Wallet addWallet() {
+        User authenticatedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = authenticatedUser.getEmail();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Wallet wallet = new Wallet();
+        wallet.setUser(user);
+        wallet.setBalance(BigDecimal.ZERO);
+        wallet.setCreated_at(LocalDateTime.now());
+        wallet.setUpdated_at(LocalDateTime.now());
+
+        return walletRepository.save(wallet);
+    }
+
+    public Optional<Wallet> getWalletById(Long id) {
+        return walletRepository.findById(id);
+    }
+
+    public void deleteWallet(Long id) {
+        walletRepository.deleteById(id);
+    }
+
+    public List<Wallet> getWalletsForAuthenticatedUser() {
+        User user = getAuthenticatedUser();
+        return walletRepository.findByUserId(user.getId());
+    }
+}
