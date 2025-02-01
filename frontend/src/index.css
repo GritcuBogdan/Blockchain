@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.ticker-container {
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  width: 100%;
+}
+
+.ticker-content {
+  display: flex;
+  gap: 20px; /* Adjust spacing between logos */
+  width: max-content;
+  animation: scroll 40s linear infinite;
+}
+
+/* Ensure a seamless loop by duplicating the images */
+.ticker-content > * {
+  flex-shrink: 0;
+}
