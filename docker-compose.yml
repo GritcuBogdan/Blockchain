@@ -2,7 +2,7 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: postgres_walletapp
+    container_name: postgres_db
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -13,8 +13,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  walletapp:
-    container_name: walletapp
+  backend:
+    container_name: backend
     build:
       context: .
       dockerfile: Dockerfile
@@ -23,9 +23,21 @@ services:
     depends_on:
       - postgres
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_walletapp:5432/walletapp
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/walletapp
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: password
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    environment:
+      VITE_BACKEND_URL: http://backend:8080
 
 volumes:
   postgres_data:
