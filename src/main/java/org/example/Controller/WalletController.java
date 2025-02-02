@@ -30,33 +30,18 @@ public class WalletController {
     }
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<List<Wallet>> getWalletsForUser(@PathVariable Long userId) {
-        List<Wallet> wallets = walletService.getWalletsForUser(userId);
+    public ResponseEntity<List<Wallet>> getWalletsForAuthentificatedUser() {
+        List<Wallet> wallets = walletService.getWalletsForAuthenticatedUser();
         if (wallets.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         return ResponseEntity.ok(wallets);
     }
 
-    @PostMapping
-    public ResponseEntity<Wallet> addWallet(
-            @RequestParam Long userId,
-            @RequestParam Double initialBalance) {
-        Wallet wallet = walletService.addWallet(userId, initialBalance);
+    @PostMapping("/addWallet")
+    public ResponseEntity<Wallet> addWallet() {
+        Wallet wallet = walletService.addWallet();
         return ResponseEntity.status(HttpStatus.CREATED).body(wallet);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Wallet> updateWallet(@PathVariable Long id, @Valid @RequestBody Wallet updatedWallet) {
-        Optional<Wallet> wallet = walletRepository.findById(id);
-        if (wallet.isPresent()) {
-            Wallet existingWallet = wallet.get();
-            existingWallet.setBalance(updatedWallet.getBalance());
-            existingWallet.setUpdated_at(LocalDateTime.now());
-            walletRepository.save(existingWallet);
-            return ResponseEntity.ok(existingWallet);
-        }
-        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")

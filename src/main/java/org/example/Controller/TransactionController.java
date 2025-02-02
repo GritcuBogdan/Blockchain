@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -23,7 +24,7 @@ public class TransactionController {
     public ResponseEntity<Transaction> transfer(
             @RequestParam Long senderWalletId,
             @RequestParam Long receiverWalletId,
-            @RequestParam Double amount) {
+            @RequestParam BigDecimal amount) {
 
         Transaction transaction = transactionService.transfer(senderWalletId, receiverWalletId, amount);
         return ResponseEntity.status(HttpStatus.CREATED).body(transaction);
@@ -33,7 +34,7 @@ public class TransactionController {
     @PostMapping("/withdraw")
     public ResponseEntity<Transaction> withdraw(
             @RequestParam Long walletId,
-            @RequestParam Double amount) {
+            @RequestParam BigDecimal amount) {
 
         Transaction transaction = transactionService.withdraw(walletId, amount);
         return ResponseEntity.status(HttpStatus.OK).body(transaction);
@@ -43,7 +44,7 @@ public class TransactionController {
     @PostMapping("/deposit")
     public ResponseEntity<Transaction> deposit(
             @RequestParam Long walletId,
-            @RequestParam Double amount) {
+            @RequestParam BigDecimal amount) {
 
         Transaction transaction = transactionService.deposit(walletId, amount);
         return ResponseEntity.status(HttpStatus.OK).body(transaction);

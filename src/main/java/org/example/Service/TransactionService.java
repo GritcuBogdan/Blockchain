@@ -6,6 +6,7 @@ import org.example.Repository.TransactionRepository;
 import org.example.Repository.WalletRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +23,7 @@ public class TransactionService {
     }
 
 
-    public Transaction transfer(Long senderWalletId, Long receiverWalletId, Double amount) {
+    public Transaction transfer(Long senderWalletId, Long receiverWalletId, BigDecimal amount) {
         if(receiverWalletId == senderWalletId) {
             throw new IllegalArgumentException("Receiver Wallet Id is the same as sender Wallet Id");
         }
@@ -37,13 +38,16 @@ public class TransactionService {
         Wallet senderWallet = senderWalletOpt.get();
         Wallet receiverWallet = receiverWalletOpt.get();
 
-        if (senderWallet.getBalance() < amount) {
+        if (senderWallet.getBalance().compareTo(amount) < 0) {
             throw new IllegalArgumentException("Sender wallet has insufficient balance.");
         }
 
 
-        senderWallet.setBalance(senderWallet.getBalance() - amount);
-        receiverWallet.setBalance(receiverWallet.getBalance() + amount);
+        senderWallet.setBalance(senderWallet.getBalance().subtract(amount));
+        receiverWallet.setBalance(receiverWallet.getBalance().add(amount));
+
+        //TODO: change the way it saves the wallets since bad requests can still change the entities
+
 
         walletRepository.save(senderWallet);
         walletRepository.save(receiverWallet);
@@ -55,12 +59,12 @@ public class TransactionService {
         transaction.setAmount(amount);
         transaction.setTimestamp(LocalDateTime.now());
         transaction.setStatus("SUCCESS");
-        transaction.setTransactionHash(generateTransactionHash(senderWalletId, receiverWalletId, amount, transaction.getTimestamp(), transaction.getTransactionType()));
         transaction.setTransactionType("TRANSFER");
+        transaction.setTransactionHash(generateTransactionHash(senderWalletId, receiverWalletId, amount, transaction.getTimestamp(), transaction.getTransactionType()));
         return transactionRepository.save(transaction);
     }
 
-    public Transaction deposit(Long walletId, Double amount) {
+    public Transaction deposit(Long walletId, BigDecimal amount) {
         Optional<Wallet> walletOpt = walletRepository.findById(walletId);
 
         if (walletOpt.isEmpty()) {
@@ -69,12 +73,12 @@ public class TransactionService {
 
         Wallet wallet = walletOpt.get();
 
-        if (amount <= 0) {
+        if (amount.compareTo(wallet.getBalance()) < 0) {
             throw new IllegalArgumentException("Amount must be greater than 0.");
         }
 
 
-        wallet.setBalance(wallet.getBalance() + amount);
+        wallet.setBalance(wallet.getBalance().add(amount));
         walletRepository.save(wallet);
 
 
@@ -90,7 +94,7 @@ public class TransactionService {
         return transactionRepository.save(transaction);
     }
 
-    public Transaction withdraw(Long walletId, Double amount) {
+    public Transaction withdraw(Long walletId, BigDecimal amount) {
         Optional<Wallet> walletOpt = walletRepository.findById(walletId);
 
         if (walletOpt.isEmpty()) {
@@ -99,15 +103,15 @@ public class TransactionService {
 
         Wallet wallet = walletOpt.get();
 
-        if (amount <= 0) {
+        if (amount.compareTo(BigDecimal.ZERO) < 0 ){
             throw new IllegalArgumentException("Amount must be greater than 0.");
         }
 
-        if (wallet.getBalance() < amount) {
+        if (wallet.getBalance().compareTo(amount) < 0) {
             throw new IllegalArgumentException("Wallet has insufficient balance.");
         }
 
-        wallet.setBalance(wallet.getBalance() - amount);
+        wallet.setBalance(wallet.getBalance().subtract(amount));
         walletRepository.save(wallet);
 
 
@@ -125,7 +129,7 @@ public class TransactionService {
 
 
 
-    private String generateTransactionHash(Long senderWalletId, Long receiverWalletId, Double amount, LocalDateTime timestamp, String transactionType) {
+    private String generateTransactionHash(Long senderWalletId, Long receiverWalletId, BigDecimal amount, LocalDateTime timestamp, String transactionType) {
         String data;
 
         if ("TRANSFER".equals(transactionType)) {
@@ -133,19 +137,19 @@ public class TransactionService {
             if (senderWalletId == null || receiverWalletId == null) {
                 throw new IllegalArgumentException("Both senderWalletId and receiverWalletId must be provided for a TRANSFER");
             }
-            data = senderWalletId + receiverWalletId + amount + timestamp.toString();
+            data = senderWalletId + receiverWalletId + amount.toString() + timestamp.toString();
         } else if ("DEPOSIT".equals(transactionType)) {
 
             if (receiverWalletId == null) {
                 throw new IllegalArgumentException("receiverWalletId must be provided for DEPOSIT");
             }
-            data = receiverWalletId + amount + timestamp.toString();
+            data = receiverWalletId + amount.toString() + timestamp.toString();
         } else if ("WITHDRAW".equals(transactionType)) {
 
             if (senderWalletId == null) {
                 throw new IllegalArgumentException("senderWalletId must be provided for WITHDRAW");
             }
-            data = senderWalletId + amount + timestamp.toString();
+            data = senderWalletId + amount.toString() + timestamp.toString();
         }
         else {
             throw new IllegalArgumentException("Invalid transaction type");

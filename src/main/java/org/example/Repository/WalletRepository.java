@@ -13,5 +13,7 @@ import java.util.Optional;
 public interface WalletRepository extends JpaRepository<Wallet, Long> {
     @Query("SELECT w FROM Wallet w WHERE w.walletId = :walletId")
     Optional<Wallet> getWalletByWalletId(@Param("walletId") Long walletId);
-    public List<Wallet> findByUserId(Long userId);
+
+    @Query("SELECT w FROM Wallet w WHERE w.user.id = :userId")
+    List<Wallet> findByUserId(@Param("userId") Integer userId);
 }
