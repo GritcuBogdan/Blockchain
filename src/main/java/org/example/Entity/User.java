@@ -32,6 +32,9 @@ public class User implements UserDetails {
     private BigDecimal Total_Balance;
 
     @Enumerated(EnumType.STRING)
+    private CurrencyType baseCurrency;
+
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     @Override

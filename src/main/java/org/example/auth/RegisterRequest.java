@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.Entity.CurrencyType;
 
 @Data
 @Builder
@@ -14,4 +15,5 @@ public class RegisterRequest {
     private String lastname;
     private String email;
     private String password;
+    private CurrencyType baseCurrency;
 }

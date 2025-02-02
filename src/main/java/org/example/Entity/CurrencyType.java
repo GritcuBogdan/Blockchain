@@ -1,6 +1,6 @@
 package org.example.Entity;
 
-public enum baseCurrency {
+public enum CurrencyType {
     USD,
     EUR,
     GBP,
