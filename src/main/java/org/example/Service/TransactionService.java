@@ -46,6 +46,9 @@ public class TransactionService {
         senderWallet.setBalance(senderWallet.getBalance().subtract(amount));
         receiverWallet.setBalance(receiverWallet.getBalance().add(amount));
 
+        //TODO: change the way it saves the wallets since bad requests can still change the entities
+
+
         walletRepository.save(senderWallet);
         walletRepository.save(receiverWallet);
 
