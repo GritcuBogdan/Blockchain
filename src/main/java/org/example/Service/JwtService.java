@@ -1,4 +1,4 @@
-package org.example.config;
+package org.example.Service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;

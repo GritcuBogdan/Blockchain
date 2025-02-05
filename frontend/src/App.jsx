@@ -5,6 +5,7 @@ import Home from "./pages/Home.jsx";
 import RegisterPage from "./pages/Register.jsx";
 import Header from "./components/Header.jsx";
 import Footer from "./components/Footer";
+import Login from "./pages/Login.jsx";
 
 function App() {
     return (
@@ -13,6 +14,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/register" element={<RegisterPage />} />
+                <Route path="/login" element={<Login />} />
             </Routes>
             <Footer />
         </div>

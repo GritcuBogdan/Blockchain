@@ -8,7 +8,6 @@ import org.example.Entity.CurrencyType;
 import org.example.auth.AuthenticationRequest;
 import org.example.auth.AuthenticationResponse;
 import org.example.auth.RegisterRequest;
-import org.example.config.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;

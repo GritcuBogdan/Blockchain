@@ -1,5 +1,7 @@
 package org.example.Controller;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.example.Service.AuthenticationService;
 import org.example.auth.AuthenticationRequest;
@@ -24,8 +26,28 @@ public class AuthenticationController {
     }
 
     @PostMapping("/authentication")
-    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request){
-        return ResponseEntity.ok(service.authenticate(request));
+    public ResponseEntity<AuthenticationResponse> authenticate(
+            @RequestBody AuthenticationRequest request,
+            HttpServletResponse response) {
+
+        AuthenticationResponse authResponse = service.authenticate(request);
+
+        String jwtToken = authResponse.getToken();
+
+        // Setează token-ul JWT într-un cookie
+        Cookie jwtCookie = new Cookie("jwt", jwtToken);
+        jwtCookie.setHttpOnly(true); // Protejează cookie-ul împotriva accesului JavaScript
+        jwtCookie.setSecure(true);  // Activează doar pentru conexiuni HTTPS
+        jwtCookie.setPath("/");     // Disponibil pentru întreaga aplicație
+        jwtCookie.setMaxAge(7 * 24 * 60 * 60); // Durată de 7 zile
+
+        // Adaugă cookie-ul la răspuns
+        response.addCookie(jwtCookie);
+
+        // Returnează întregul obiect AuthenticationResponse
+        return ResponseEntity.ok(authResponse);
     }
+
+
 
 }
