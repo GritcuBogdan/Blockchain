@@ -1,63 +1,146 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+    const [activeTab, setActiveTab] = useState("signin");
+    const [currency, setCurrency] = useState("");
+    const dropdownRef = useRef(null);
 
-  // Funcția pentru trimiterea formularului
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                dropdownRef.current.removeAttribute("open");
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
-    try {
-      const response = await fetch("http://localhost:8080/api/v1/auth/authentication", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // Permite trimiterea și setarea cookie-urilor
-        body: JSON.stringify({ email, password }), // Trimite email și parola
-      });
+    return (
+        <div className="flex flex-col items-center justify-center min-h-screen">
+            <div className="w-full max-w-lg mb-40">
+                <div
+                    role="tablist"
+                    className="tabs tabs-boxed mb-5 border border-white rounded-md justify-between items-center px-18"
+                >
+                    <button
+                        role="tab"
+                        className={`tab ${activeTab === "signin" ? "tab-active" : ""}`}
+                        onClick={() => setActiveTab("signin")}
+                        style={{ color: "white" }}
+                    >
+                        Sign In
+                    </button>
+                    <button
+                        role="tab"
+                        className={`tab ${activeTab === "signup" ? "tab-active" : ""}`}
+                        onClick={() => setActiveTab("signup")}
+                        style={{ color: "white" }}
+                    >
+                        Sign Up
+                    </button>
+                </div>
+                <div className="relative h-[420px]">
+                    <div
+                        className={`card border border-white shadow-md p-6 absolute w-full transition-opacity duration-300 ${
+                            activeTab === "signin"
+                                ? "opacity-100 visible"
+                                : "opacity-0 invisible"
+                        }`}
+                    >
+                        <h2 className="text-xl font-semibold mb-2" style={{ color: "white" }}>
+                            Log in to your account
+                        </h2>
+                        <p className="text-sm text-gray-500 mb-4">
+                            Enter your email and password to log in.
+                        </p>
+                        <form className="space-y-4">
+                            <input
+                                type="email"
+                                placeholder="Email"
+                                className="input input-bordered w-full bg-transparent text-gray-100"
+                            />
+                            <input
+                                type="password"
+                                placeholder="Password"
+                                className="input input-bordered w-full bg-transparent text-gray-100"
+                            />
+                            <a
+                                href="/reset-password"
+                                className="text-sm text-primary block text-center"
+                            >
+                                Forgot your password?
+                            </a>
+                            <button className="btn btn-primary w-full bg-transparent">
+                                Log In
+                            </button>
+                        </form>
+                    </div>
+                    <div
+                        className={`card border border-white shadow-md p-6 absolute w-full transition-opacity duration-300 ${
+                            activeTab === "signup"
+                                ? "opacity-100 visible"
+                                : "opacity-0 invisible"
+                        }`}
+                    >
+                        <h2 className="text-xl font-semibold mb-2 text-white">Create a New Account</h2>
+                        <p className="text-sm text-gray-500 mb-4">
+                            Enter your details to create a new account.
+                        </p>
+                        <form className="space-y-4">
+                            <input
+                                type="text"
+                                placeholder="First Name"
+                                className="input input-bordered w-full bg-transparent text-gray-100"
+                            />
+                            <input
+                                type="text"
+                                placeholder="Last Name"
+                                className="input input-bordered w-full bg-transparent text-gray-100"
+                            />
+                            <input
+                                type="email"
+                                placeholder="Email"
+                                className="input input-bordered w-full bg-transparent text-gray-100"
+                            />
+                            <input
+                                type="password"
+                                placeholder="Password"
+                                className="input input-bordered w-full bg-transparent text-gray-100"
+                            />
+                            <input
+                                type="password"
+                                placeholder="Confirm Password"
+                                className="input input-bordered w-full bg-transparent"
+                            />
+                            <details
+                                className="dropdown bg-transparent w-full"
+                                ref={dropdownRef}
+                            >
+                                <summary className="btn bg-transparent w-full border border-gray-600 rounded-md text-white">
+                                    {currency ? currency : "Select Currency"}
+                                </summary>
+                                <ul className="menu w-full dropdown-content rounded-box z-[1] p-2 shadow border border-white text-gray-100 bg-[#222222]">
+                                    <li onClick={() => setCurrency("USD")}>
+                                        <a>USD</a>
+                                    </li>
+                                    <li onClick={() => setCurrency("EUR")}>
+                                        <a>EUR</a>
+                                    </li>
+                                    <li onClick={() => setCurrency("GBP")}>
+                                        <a>GBP</a>
+                                    </li>
+                                </ul>
+                            </details>
 
-      if (!response.ok) {
-        throw new Error("Autentificare eșuată!");
-      }
-
-      const data = await response.json(); // Obține răspunsul complet
-      console.log("Răspuns:", data);
-      alert("Autentificare reușită!");
-    } catch (error) {
-      console.error(error.message);
-    }
-  };
-
-  return (
-    <div className="login-container">
-      <h1>Logare</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+                            <button className="btn btn-primary w-full bg-transparent text-white">
+                                Sign Up
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div>
-          <label htmlFor="password">Parolă:</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Autentifică-te</button>
-      </form>
-    </div>
-  );
+    );
 };
 
 export default Login;
