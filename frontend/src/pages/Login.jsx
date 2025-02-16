@@ -1,8 +1,18 @@
 import React, { useState, useRef, useEffect } from "react";
+import axios from "axios";
 
 const Login = () => {
     const [activeTab, setActiveTab] = useState("signin");
     const [currency, setCurrency] = useState("");
+    const [signInData, setSignInData] = useState({ email: "", password: "" });
+    const [signUpData, setSignUpData] = useState({
+        firstname: "",
+        lastname: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        baseCurrency: ""
+    });
     const dropdownRef = useRef(null);
 
     useEffect(() => {
@@ -14,6 +24,50 @@ const Login = () => {
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
+
+    const handleSignInChange = (e) => {
+        setSignInData({ ...signInData, [e.target.name]: e.target.value });
+    };
+
+    const handleSignUpChange = (e) => {
+        setSignUpData({ ...signUpData, [e.target.name]: e.target.value });
+    };
+
+    const handleSignInSubmit = async (e) => {
+        e.preventDefault(); // Prevent form from reloading
+
+        try {
+            const response = await axios.post("http://localhost:8080/api/v1/auth/authentication", signInData);
+            console.log("Sign in successful:", response.data);
+
+            // Clear the form after successful login
+            setSignInData({ email: "", password: "" });
+        } catch (error) {
+            console.error("Error during sign in:", error);
+        }
+    };
+
+    const handleSignUpSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post("http://localhost:8080/api/v1/auth/register", {
+                ...signUpData,
+                baseCurrency: currency // Ensure the currency is included in the request
+            });
+            console.log("Sign up successful:", response.data);
+            setSignUpData({
+                firstname: "",
+                lastname: "",
+                email: "",
+                password: "",
+                confirmPassword: "",
+                baseCurrency: ""
+            }); // Clear the form
+            setCurrency(""); // Clear the currency
+        } catch (error) {
+            console.error("Error during sign up:", error);
+        }
+    };
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">
@@ -53,16 +107,22 @@ const Login = () => {
                         <p className="text-sm text-gray-500 mb-4">
                             Enter your email and password to log in.
                         </p>
-                        <form className="space-y-4">
+                        <form className="space-y-4" onSubmit={handleSignInSubmit}>
                             <input
                                 type="email"
+                                name="email"
                                 placeholder="Email"
                                 className="input input-bordered w-full bg-transparent text-gray-100"
+                                value={signInData.email}
+                                onChange={handleSignInChange}
                             />
                             <input
                                 type="password"
+                                name="password"
                                 placeholder="Password"
                                 className="input input-bordered w-full bg-transparent text-gray-100"
+                                value={signInData.password}
+                                onChange={handleSignInChange}
                             />
                             <a
                                 href="/reset-password"
@@ -86,31 +146,46 @@ const Login = () => {
                         <p className="text-sm text-gray-500 mb-4">
                             Enter your details to create a new account.
                         </p>
-                        <form className="space-y-4">
+                        <form className="space-y-4" onSubmit={handleSignUpSubmit}>
                             <input
                                 type="text"
+                                name="firstname"
                                 placeholder="First Name"
                                 className="input input-bordered w-full bg-transparent text-gray-100"
+                                value={signUpData.firstname}
+                                onChange={handleSignUpChange}
                             />
                             <input
                                 type="text"
+                                name="lastname"
                                 placeholder="Last Name"
                                 className="input input-bordered w-full bg-transparent text-gray-100"
+                                value={signUpData.lastname}
+                                onChange={handleSignUpChange}
                             />
                             <input
                                 type="email"
+                                name="email"
                                 placeholder="Email"
                                 className="input input-bordered w-full bg-transparent text-gray-100"
+                                value={signUpData.email}
+                                onChange={handleSignUpChange}
                             />
                             <input
                                 type="password"
+                                name="password"
                                 placeholder="Password"
                                 className="input input-bordered w-full bg-transparent text-gray-100"
+                                value={signUpData.password}
+                                onChange={handleSignUpChange}
                             />
                             <input
                                 type="password"
+                                name="confirmPassword"
                                 placeholder="Confirm Password"
-                                className="input input-bordered w-full bg-transparent"
+                                className="input input-bordered w-full bg-transparent text-gray-100"
+                                value={signUpData.confirmPassword}
+                                onChange={handleSignUpChange}
                             />
                             <details
                                 className="dropdown bg-transparent w-full"

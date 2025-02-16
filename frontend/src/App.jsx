@@ -2,14 +2,12 @@ import { Route, Routes, useLocation } from "react-router-dom";
 import "./index.css";
 import "./global/global.scss";
 import Home from "./pages/Home.jsx";
+
 import Header from "./components/Header.jsx";
 import Footer from "./components/Footer";
-import Login from "./pages/Login";
-
-function App() {
+import Login from "./pages/Login.jsx";function App() {
     const location = useLocation();
     const showFooter = location.pathname !== "/login";
-
     return (
         <div className="font-mono">
             <Header />
@@ -17,9 +15,9 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
             </Routes>
+            <Footer />
             {showFooter && <Footer />}
         </div>
     );
 }
-
 export default App;
