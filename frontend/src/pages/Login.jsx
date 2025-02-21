@@ -5,6 +5,33 @@ const Login = () => {
     const [currency, setCurrency] = useState("");
     const dropdownRef = useRef(null);
 
+    const [login, setLogin] = useState({
+        email: "",
+        password: ""
+    });
+
+    const handleSubmit = async (e) => {
+            e.preventDefault();
+            try {
+                const response = await fetch("http://localhost:8080/api/v1/auth/authentication", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    credentials: "include", // Permite cookie-urilor să fie salvate și trimise automat
+                    body: JSON.stringify({ email, password }),
+                });
+
+                if (!response.ok) {
+                    throw new Error("Autentificare eșuată!");
+                }
+
+                alert("Autentificare reușită!");
+            } catch (error) {
+                console.error("Eroare autentificare:", error.message);
+            }
+        };
+
     useEffect(() => {
         function handleClickOutside(event) {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -53,16 +80,24 @@ const Login = () => {
                         <p className="text-sm text-gray-500 mb-4">
                             Enter your email and password to log in.
                         </p>
-                        <form className="space-y-4">
+                        <form className="space-y-4" onSubmit={handleSubmit}>
                             <input
                                 type="email"
                                 placeholder="Email"
                                 className="input input-bordered w-full bg-transparent text-gray-100"
+                                value={login.email}
+                                onChange={(e) => {
+                                    setLogin({...login, email: e.target.value})
+                                }}
                             />
                             <input
                                 type="password"
                                 placeholder="Password"
                                 className="input input-bordered w-full bg-transparent text-gray-100"
+                                value={login.password}
+                                onChange={(e) => {
+                                    setLogin({...login, password: e.target.value})
+                                }}
                             />
                             <a
                                 href="/reset-password"

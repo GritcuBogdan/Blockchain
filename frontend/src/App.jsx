@@ -15,7 +15,7 @@ function App() {
             <Header />
             <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/register" element={<RegisterPage />} />
+{/*                 <Route path="/register" element={<RegisterPage />} /> */}
                 <Route path="/login" element={<Login />} />
             </Routes>
             {showFooter && <Footer />}
