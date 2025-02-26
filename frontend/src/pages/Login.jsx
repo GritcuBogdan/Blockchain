@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useNavigate } from "react";
 import axios from "axios";
 
 const Login = () => {
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("signin");
     const [currency, setCurrency] = useState("");
     const [signInData, setSignInData] = useState({ email: "", password: "" });
@@ -14,6 +15,8 @@ const Login = () => {
         baseCurrency: ""
     });
     const dropdownRef = useRef(null);
+
+
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -33,19 +36,32 @@ const Login = () => {
         setSignUpData({ ...signUpData, [e.target.name]: e.target.value });
     };
 
-    const handleSignInSubmit = async (e) => {
-        e.preventDefault(); // Prevent form from reloading
-
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         try {
-            const response = await axios.post("http://localhost:8080/api/v1/auth/authentication", signInData);
-            console.log("Sign in successful:", response.data);
+            const response = await fetch("http://localhost:8080/api/v1/auth/authentication", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include", // Permite cookie-urilor să fie salvate și trimise automat
+                body: JSON.stringify(signInData),
+            });
 
-            // Clear the form after successful login
+            if (!response.ok) {
+                throw new Error("Autentificare eșuată!");
+            }
+
+            alert("Autentificare reușită!");
+
+            // Curăță formularul după autentificare
             setSignInData({ email: "", password: "" });
+              navigate("/");
         } catch (error) {
-            console.error("Error during sign in:", error);
+            console.error("Eroare autentificare:", error.message);
         }
     };
+
 
     const handleSignUpSubmit = async (e) => {
         e.preventDefault();
@@ -107,7 +123,7 @@ const Login = () => {
                         <p className="text-sm text-gray-500 mb-4">
                             Enter your email and password to log in.
                         </p>
-                        <form className="space-y-4" onSubmit={handleSignInSubmit}>
+                        <form className="space-y-4" onSubmit={handleSubmit}>
                             <input
                                 type="email"
                                 name="email"

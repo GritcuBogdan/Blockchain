@@ -5,7 +5,9 @@ import Home from "./pages/Home.jsx";
 
 import Header from "./components/Header.jsx";
 import Footer from "./components/Footer";
-import Login from "./pages/Login.jsx";function App() {
+import Login from "./pages/Login.jsx";
+
+    function App() {
     const location = useLocation();
     const showFooter = location.pathname !== "/login";
     return (
@@ -15,7 +17,6 @@ import Login from "./pages/Login.jsx";function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
             </Routes>
-            <Footer />
             {showFooter && <Footer />}
         </div>
     );
