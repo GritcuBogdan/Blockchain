@@ -26,8 +26,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/authentication")
-    public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request,
+    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request,
             HttpServletResponse response) {
 
         AuthenticationResponse authResponse = service.authenticate(request);
@@ -39,7 +38,7 @@ public class AuthenticationController {
         jwtCookie.setHttpOnly(true); // Protejează cookie-ul împotriva accesului JavaScript
         jwtCookie.setSecure(true);  // Activează doar pentru conexiuni HTTPS
         jwtCookie.setPath("/");     // Disponibil pentru întreaga aplicație
-        jwtCookie.setMaxAge(7 * 24 * 60 * 60); // Durată de 7 zile
+        jwtCookie.setMaxAge(60 * 60); // Durată de 1 ora ( zi * ore * minute * secunde)
 
         // Adaugă cookie-ul la răspuns
         response.addCookie(jwtCookie);

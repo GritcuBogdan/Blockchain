@@ -1,10 +1,22 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useNavigate } from "react";
+import axios from "axios";
 
 const Login = () => {
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("signin");
     const [currency, setCurrency] = useState("");
+    const [signInData, setSignInData] = useState({ email: "", password: "" });
+    const [signUpData, setSignUpData] = useState({
+        firstname: "",
+        lastname: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        baseCurrency: ""
+    });
     const dropdownRef = useRef(null);
 
+<<<<<<< HEAD
     const [login, setLogin] = useState({
         email: "",
         password: ""
@@ -31,6 +43,9 @@ const Login = () => {
                 console.error("Eroare autentificare:", error.message);
             }
         };
+=======
+
+>>>>>>> master
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -41,6 +56,63 @@ const Login = () => {
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
+
+    const handleSignInChange = (e) => {
+        setSignInData({ ...signInData, [e.target.name]: e.target.value });
+    };
+
+    const handleSignUpChange = (e) => {
+        setSignUpData({ ...signUpData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await fetch("http://localhost:8080/api/v1/auth/authentication", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include", // Permite cookie-urilor să fie salvate și trimise automat
+                body: JSON.stringify(signInData),
+            });
+
+            if (!response.ok) {
+                throw new Error("Autentificare eșuată!");
+            }
+
+            alert("Autentificare reușită!");
+
+            // Curăță formularul după autentificare
+            setSignInData({ email: "", password: "" });
+              navigate("/");
+        } catch (error) {
+            console.error("Eroare autentificare:", error.message);
+        }
+    };
+
+
+    const handleSignUpSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post("http://localhost:8080/api/v1/auth/register", {
+                ...signUpData,
+                baseCurrency: currency // Ensure the currency is included in the request
+            });
+            console.log("Sign up successful:", response.data);
+            setSignUpData({
+                firstname: "",
+                lastname: "",
+                email: "",
+                password: "",
+                confirmPassword: "",
+                baseCurrency: ""
+            }); // Clear the form
+            setCurrency(""); // Clear the currency
+        } catch (error) {
+            console.error("Error during sign up:", error);
+        }
+    };
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">
@@ -83,21 +155,33 @@ const Login = () => {
                         <form className="space-y-4" onSubmit={handleSubmit}>
                             <input
                                 type="email"
+                                name="email"
                                 placeholder="Email"
                                 className="input input-bordered w-full bg-transparent text-gray-100"
+<<<<<<< HEAD
                                 value={login.email}
                                 onChange={(e) => {
                                     setLogin({...login, email: e.target.value})
                                 }}
+=======
+                                value={signInData.email}
+                                onChange={handleSignInChange}
+>>>>>>> master
                             />
                             <input
                                 type="password"
+                                name="password"
                                 placeholder="Password"
                                 className="input input-bordered w-full bg-transparent text-gray-100"
+<<<<<<< HEAD
                                 value={login.password}
                                 onChange={(e) => {
                                     setLogin({...login, password: e.target.value})
                                 }}
+=======
+                                value={signInData.password}
+                                onChange={handleSignInChange}
+>>>>>>> master
                             />
                             <a
                                 href="/reset-password"
@@ -121,31 +205,46 @@ const Login = () => {
                         <p className="text-sm text-gray-500 mb-4">
                             Enter your details to create a new account.
                         </p>
-                        <form className="space-y-4">
+                        <form className="space-y-4" onSubmit={handleSignUpSubmit}>
                             <input
                                 type="text"
+                                name="firstname"
                                 placeholder="First Name"
                                 className="input input-bordered w-full bg-transparent text-gray-100"
+                                value={signUpData.firstname}
+                                onChange={handleSignUpChange}
                             />
                             <input
                                 type="text"
+                                name="lastname"
                                 placeholder="Last Name"
                                 className="input input-bordered w-full bg-transparent text-gray-100"
+                                value={signUpData.lastname}
+                                onChange={handleSignUpChange}
                             />
                             <input
                                 type="email"
+                                name="email"
                                 placeholder="Email"
                                 className="input input-bordered w-full bg-transparent text-gray-100"
+                                value={signUpData.email}
+                                onChange={handleSignUpChange}
                             />
                             <input
                                 type="password"
+                                name="password"
                                 placeholder="Password"
                                 className="input input-bordered w-full bg-transparent text-gray-100"
+                                value={signUpData.password}
+                                onChange={handleSignUpChange}
                             />
                             <input
                                 type="password"
+                                name="confirmPassword"
                                 placeholder="Confirm Password"
-                                className="input input-bordered w-full bg-transparent"
+                                className="input input-bordered w-full bg-transparent text-gray-100"
+                                value={signUpData.confirmPassword}
+                                onChange={handleSignUpChange}
                             />
                             <details
                                 className="dropdown bg-transparent w-full"
