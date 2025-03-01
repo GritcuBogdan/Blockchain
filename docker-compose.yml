@@ -7,25 +7,41 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: walletapp
+      POSTGRES_DB: userdb
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  backend:
-    container_name: backend
+  user-management-service:
+    container_name: user_management_service
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: UserManagementService/Dockerfile
     ports:
       - "8080:8080"
     depends_on:
       - postgres
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/walletapp
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/userdb
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: drop-and-create
+
+  wallet-service:
+    container_name: wallet_service
+    build:
+      context: .
+      dockerfile: WalletService/Dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/walletdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: drop-and-create
 
   frontend:
     container_name: frontend
@@ -35,7 +51,8 @@ services:
     ports:
       - "5173:5173"
     depends_on:
-      - backend
+      - user-management-service
+      - wallet-service
     environment:
       VITE_BACKEND_URL: http://backend:8080
 

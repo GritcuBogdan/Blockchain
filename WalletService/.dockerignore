@@ -1,0 +1,35 @@
+# Ignore the .git directory
+.git
+
+# Ignore node_modules directories
+node_modules
+
+# Ignore target directories (Maven build output)
+target
+
+# Ignore Dockerfiles
+Dockerfile
+
+# Ignore markdown files
+*.md
+
+# Ignore log files
+*.log
+
+# Ignore IntelliJ IDEA project files
+.idea
+
+# Ignore Eclipse project files
+.project
+.classpath
+.settings/
+
+# Ignore temporary files
+*.tmp
+*.swp
+*.bak
+*.old
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
