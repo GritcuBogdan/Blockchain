@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect, useNavigate } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import {useNavigate} from "react-router-dom";
 import axios from "axios";
 
 const Login = () => {
@@ -16,36 +17,11 @@ const Login = () => {
     });
     const dropdownRef = useRef(null);
 
-<<<<<<< HEAD
+
     const [login, setLogin] = useState({
         email: "",
         password: ""
     });
-
-    const handleSubmit = async (e) => {
-            e.preventDefault();
-            try {
-                const response = await fetch("http://localhost:8080/api/v1/auth/authentication", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    credentials: "include", // Permite cookie-urilor să fie salvate și trimise automat
-                    body: JSON.stringify({ email, password }),
-                });
-
-                if (!response.ok) {
-                    throw new Error("Autentificare eșuată!");
-                }
-
-                alert("Autentificare reușită!");
-            } catch (error) {
-                console.error("Eroare autentificare:", error.message);
-            }
-        };
-=======
-
->>>>>>> master
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -62,32 +38,25 @@ const Login = () => {
     };
 
     const handleSignUpChange = (e) => {
-        setSignUpData({ ...signUpData, [e.target.name]: e.target.value });
-    };
+            setSignUpData({ ...signUpData, [e.target.name]: e.target.value });
+        };
 
-    const handleSubmit = async (e) => {
+    const handleSignInSubmit = async (e) => {
         e.preventDefault();
+
         try {
-            const response = await fetch("http://localhost:8080/api/v1/auth/authentication", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include", // Permite cookie-urilor să fie salvate și trimise automat
-                body: JSON.stringify(signInData),
-            });
+            const response = await axios.post(
+                "http://localhost:8080/api/v1/auth/authentication",
+                signInData,
+                { withCredentials: true } // Asigură salvarea cookie-urilor JWT
+            );
 
-            if (!response.ok) {
-                throw new Error("Autentificare eșuată!");
-            }
-
-            alert("Autentificare reușită!");
+            console.log("Sign in successful:", response.data);
 
             // Curăță formularul după autentificare
             setSignInData({ email: "", password: "" });
-              navigate("/");
         } catch (error) {
-            console.error("Eroare autentificare:", error.message);
+            console.error("Error during sign in:", error.response?.data || error.message);
         }
     };
 
@@ -152,36 +121,26 @@ const Login = () => {
                         <p className="text-sm text-gray-500 mb-4">
                             Enter your email and password to log in.
                         </p>
-                        <form className="space-y-4" onSubmit={handleSubmit}>
+                        <form className="space-y-4" onSubmit={handleSignInSubmit}>
                             <input
                                 type="email"
                                 name="email"
                                 placeholder="Email"
                                 className="input input-bordered w-full bg-transparent text-gray-100"
-<<<<<<< HEAD
-                                value={login.email}
-                                onChange={(e) => {
-                                    setLogin({...login, email: e.target.value})
-                                }}
-=======
+
                                 value={signInData.email}
                                 onChange={handleSignInChange}
->>>>>>> master
+
+
                             />
                             <input
                                 type="password"
                                 name="password"
                                 placeholder="Password"
                                 className="input input-bordered w-full bg-transparent text-gray-100"
-<<<<<<< HEAD
-                                value={login.password}
-                                onChange={(e) => {
-                                    setLogin({...login, password: e.target.value})
-                                }}
-=======
+
                                 value={signInData.password}
                                 onChange={handleSignInChange}
->>>>>>> master
                             />
                             <a
                                 href="/reset-password"

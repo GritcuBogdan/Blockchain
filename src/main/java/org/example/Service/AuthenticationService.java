@@ -1,10 +1,9 @@
 package org.example.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.Entity.*;
+import org.example.Repository.TokenRepository;
 import org.example.Repository.UserRepository;
-import org.example.Entity.Role;
-import org.example.Entity.User;
-import org.example.Entity.CurrencyType;
 import org.example.auth.AuthenticationRequest;
 import org.example.auth.AuthenticationResponse;
 import org.example.auth.RegisterRequest;
@@ -22,6 +21,7 @@ import java.math.BigDecimal;
 public class AuthenticationService {
 
     private final UserRepository repository;
+    private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -40,20 +40,12 @@ public class AuthenticationService {
                 .Total_Balance(BigDecimal.ZERO)
                 .baseCurrency(request.getBaseCurrency())
                 .build();
-        repository.save(user);
+        var savedUser = repository.save(user);
         var jwtToken = jwtService.generateToken(user);
+        saveUserToken(savedUser, jwtToken);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
-    }
-
-    private boolean isValidCurrency(CurrencyType currency) {
-        for (CurrencyType type : CurrencyType.values()) {
-            if (type == currency) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -66,8 +58,41 @@ public class AuthenticationService {
         var user = repository.findByEmail(request.getEmail())
                 .orElseThrow();
         var jwtToken = jwtService.generateToken(user);
+        revokeAllUserToken(user);
+        saveUserToken(user, jwtToken);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
+    }
+
+    private void revokeAllUserToken(User user){
+        var validUserTokens = tokenRepository.findAllValidTokensByUser(user.getId());
+        if(validUserTokens.isEmpty())
+            return;
+        validUserTokens.forEach(token -> {
+            token.setExpired(true);
+            token.setRevoked(true);
+        });
+        tokenRepository.saveAll(validUserTokens);
+    }
+
+    private boolean isValidCurrency(CurrencyType currency) {
+        for (CurrencyType type : CurrencyType.values()) {
+            if (type == currency) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void saveUserToken(User user, String jwtToken){
+        var token = Token.builder()
+                .user(user)
+                .token(jwtToken)
+                .tokenTipe(TokenTipe.BEARER)
+                .revoked(false)
+                .expired(false)
+                .build();
+        tokenRepository.save(token);
     }
 }
