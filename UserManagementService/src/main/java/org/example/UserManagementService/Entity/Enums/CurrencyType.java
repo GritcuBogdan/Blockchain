@@ -1,4 +1,4 @@
-package org.example.UserManagementService.Entity;
+package org.example.UserManagementService.Entity.Enums;
 
 public enum CurrencyType {
     USD,

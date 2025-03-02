@@ -1,13 +1,12 @@
 package org.example.UserManagementService.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.UserManagementService.Entity.*;
+import org.example.UserManagementService.Entity.Enums.TokenTipe;
+import org.example.UserManagementService.Repository.TokenRepository;
 import org.example.UserManagementService.Repository.UserRepository;
-import org.example.UserManagementService.Entity.Role;
-import org.example.UserManagementService.Entity.User;
-import org.example.UserManagementService.Entity.CurrencyType;
-import org.example.UserManagementService.Entity.AuthenticationRequest;
-import org.example.UserManagementService.Entity.AuthenticationResponse;
-import org.example.UserManagementService.Entity.RegisterRequest;
+import org.example.UserManagementService.Entity.Enums.Role;
+import org.example.UserManagementService.Entity.Enums.CurrencyType;
 import org.example.UserManagementService.Config.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +22,7 @@ import java.math.BigDecimal;
 public class AuthenticationService {
 
     private final UserRepository repository;
+    private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -41,20 +41,12 @@ public class AuthenticationService {
                 .Total_Balance(BigDecimal.ZERO)
                 .baseCurrency(request.getBaseCurrency())
                 .build();
-        repository.save(user);
+        var savedUser = repository.save(user);
         var jwtToken = jwtService.generateToken(user);
+        saveUserToken(savedUser, jwtToken);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
-    }
-
-    private boolean isValidCurrency(CurrencyType currency) {
-        for (CurrencyType type : CurrencyType.values()) {
-            if (type == currency) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -67,8 +59,41 @@ public class AuthenticationService {
         var user = repository.findByEmail(request.getEmail())
                 .orElseThrow();
         var jwtToken = jwtService.generateToken(user);
+        revokeAllUserToken(user);
+        saveUserToken(user, jwtToken);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
+    }
+
+    private void revokeAllUserToken(User user){
+        var validUserTokens = tokenRepository.findAllValidTokensByUser(user.getId());
+        if(validUserTokens.isEmpty())
+            return;
+        validUserTokens.forEach(token -> {
+            token.setExpired(true);
+            token.setRevoked(true);
+        });
+        tokenRepository.saveAll(validUserTokens);
+    }
+
+    private void saveUserToken(User user, String jwtToken){
+        var token = Token.builder()
+                .user(user)
+                .token(jwtToken)
+                .tokenTipe(TokenTipe.BEARER)
+                .revoked(false)
+                .expired(false)
+                .build();
+        tokenRepository.save(token);
+    }
+
+    private boolean isValidCurrency(CurrencyType currency) {
+        for (CurrencyType type : CurrencyType.values()) {
+            if (type == currency) {
+                return true;
+            }
+        }
+        return false;
     }
 }
